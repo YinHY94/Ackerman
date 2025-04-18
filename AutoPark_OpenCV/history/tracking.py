@@ -5,25 +5,26 @@ frame_width , frame_height  =640 ,480
 center_x = frame_width // 2
 center_y = frame_height // 2
 
-# GStreamer管道
-gs_pipeline = (
-    "v4l2src device=/dev/video0 ! "
-    "image/jpeg,width=640,height=480,framerate=30/1 ! "
-    "jpegparse ! "
-    "queue max-size-buffers=3 leaky=downstream ! "  # 添加缓冲队列
-    "nvv4l2decoder mjpeg=1 enable-max-performance=1 ! "
-    "nvvidconv output-buffers=10 ! "  # 增加输出缓冲区
-    "video/x-raw(memory:NVMM),format=RGBA ! "  # 显式指定内存类型
-    "nvvidconv ! " 
-    "video/x-raw,format=BGRx ! "
-    "videoconvert ! "
-    "video/x-raw,format=BGR ! "
-    "appsink drop=1 sync=0 emit-signals=0"  # 禁用所有信号
-)
+# # GStreamer管道
+# gs_pipeline = (
+#     "v4l2src device=/dev/video0 ! "
+#     "image/jpeg,width=640,height=480,framerate=30/1 ! "
+#     "jpegparse ! "
+#     "queue max-size-buffers=3 leaky=downstream ! "  # 添加缓冲队列
+#     "nvv4l2decoder mjpeg=1 enable-max-performance=1 ! "
+#     "nvvidconv output-buffers=10 ! "  # 增加输出缓冲区
+#     "video/x-raw(memory:NVMM),format=RGBA ! "  # 显式指定内存类型
+#     "nvvidconv ! " 
+#     "video/x-raw,format=BGRx ! "
+#     "videoconvert ! "
+#     "video/x-raw,format=BGR ! "
+#     "appsink drop=1 sync=0 emit-signals=0"  # 禁用所有信号
+# )
 
 
 # 摄像头
-cap = cv2.VideoCapture(gs_pipeline, cv2.CAP_GSTREAMER)
+# cap = cv2.VideoCapture(gs_pipeline, cv2.CAP_GSTREAMER)
+cap = cv2.VideoCapture(0)
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -39,16 +40,18 @@ while cap.isOpened():
     center_y = frame_height // 2
 
     #预处理
+
+    print("hello")
     original = frame.copy()
     gray = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    _, binary = cv2.threshold(blurred,30,255,cv2.THRESH_BINARY_INV)
+    _, binary = cv2.threshold(blurred,50,255,cv2.THRESH_BINARY_INV)
     kernel = np.ones((3, 3), np.uint8)
     binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
     binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
 
     #霍夫变换检测直线
-    lines = cv2.HoughLinesP(binary, 1, np.pi / 180, threshold=50, minLineLength=100, maxLineGap=10)
+    lines = cv2.HoughLinesP(binary, 1, np.pi / 180, threshold=50, minLineLength=500, maxLineGap=10)
 
     #过滤竖直线
     lane_lines = [] # 水平车道线
