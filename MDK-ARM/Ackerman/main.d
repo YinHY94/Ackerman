@@ -31,13 +31,13 @@ ackerman\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h
 ackerman\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 ackerman\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 ackerman\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
-ackerman\main.o: ../Core/Inc/dma.h
 ackerman\main.o: ../Core/Inc/tim.h
 ackerman\main.o: ../Core/Inc/usart.h
 ackerman\main.o: ../Core/Inc/gpio.h
-ackerman\main.o: ../Core/Inc/JY901.h
 ackerman\main.o: ../Core/Inc/Control.h
 ackerman\main.o: ../Core/Inc/Motor.h
-ackerman\main.o: ../Core/Inc/Control.h
 ackerman\main.o: ../Core/Inc/Servo.h
 ackerman\main.o: D:\keil_v5\ARM\ARMCC\Bin\..\include\math.h
+ackerman\main.o: ../Core/Inc/host_computer.h
+ackerman\main.o: D:\keil_v5\ARM\ARMCC\Bin\..\include\ctype.h
+ackerman\main.o: ../Core/Inc/Control.h

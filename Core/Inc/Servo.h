@@ -8,7 +8,7 @@
 #define SERVO_MIN (1130-1)
 
 
-void Set_Servo_Angle(double angle);
+void Servo_Set_Angle(double angle);
 
 
 #endif

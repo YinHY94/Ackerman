@@ -18,14 +18,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "JY901.h" 
+//#include "JY901.h" 
 #include "Control.h"
 /* USER CODE END Includes */
 
@@ -58,9 +57,9 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-float current_angle[3]={0};
-float current_accel[3]={0};
-float current_gyro[3]={0};
+//float current_angle[3]={0};
+//float current_accel[3]={0};
+//float current_gyro[3]={0};
 /* USER CODE END 0 */
 
 /**
@@ -92,18 +91,16 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_USART1_UART_Init();
-  MX_USART2_UART_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM5_Init();
-  MX_TIM9_Init();
   MX_TIM4_Init();
+  MX_TIM9_Init();
   /* USER CODE BEGIN 2 */
-JY901_Init();			//JY901初始化
-HAL_UARTEx_ReceiveToIdle_DMA(&huart2,jy901s_data.RxBuffer,RXBUFFER_LEN);
+//JY901_Init();			//JY901初始化
+//HAL_UARTEx_ReceiveToIdle_DMA(&huart2,jy901s_data.RxBuffer,RXBUFFER_LEN);
 
 HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
@@ -118,8 +115,19 @@ HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_1);
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
+//Motor_Set_Direction(&Left_Motor,Forward);
+//for(int i=30;i<80;i+=10){
+//TIM2->CCR1=i;
+//HAL_Delay(3000); 
+//}
+//for(int i=70;i>20;i-=10){
+//TIM2->CCR1=i;
+//HAL_Delay(3000); 
+//}
 	  
+	  
+	  
+ 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -174,21 +182,29 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,uint16_t Size){
-if(huart==&huart2){
-int i;
-jy901s_data.Rx_len=(uint8_t)Size;
-JY901_Get_Data();
-for(i=0;i<3;i++)
-current_accel[i]=jy901s_data.Accel[i];
+if(huart==&huart1){
+
+
+}	
 	
-for(i=0;i<3;i++)
-current_angle[i]=jy901s_data.Angle[i]*180.0/32767;
 	
-for(i=0;i<3;i++)
-current_gyro[i]=jy901s_data.Gyro[i];
-Ackerman_Turning.Yaw=current_angle[2];	
-HAL_UARTEx_ReceiveToIdle_DMA(&huart2,jy901s_data.RxBuffer,RXBUFFER_LEN);
-}
+	
+//if(huart==&huart2){
+//int i;
+//jy901s_data.Rx_len=(uint8_t)Size;
+//JY901_Get_Data();
+//for(i=0;i<3;i++)
+//current_accel[i]=jy901s_data.Accel[i];
+//	
+//for(i=0;i<3;i++)
+//current_angle[i]=jy901s_data.Angle[i]*180.0/32767;
+//	
+//for(i=0;i<3;i++)
+//current_gyro[i]=jy901s_data.Gyro[i];
+//Ackerman_Turning.Yaw=current_angle[2];	
+//HAL_UARTEx_ReceiveToIdle_DMA(&huart2,jy901s_data.RxBuffer,RXBUFFER_LEN);
+//}	
+	
 }
 
 
@@ -197,10 +213,11 @@ if(htim==&htim4){
 Motor_Speed_Control(&Left_Motor);
 Motor_Speed_Control(&Right_Motor);	
 }
-if(htim==&htim9){
 
-	
+if(htim==&htim9){
+Car_Control(Ackerman_State);
 }
+
 }
 
 /* USER CODE END 4 */

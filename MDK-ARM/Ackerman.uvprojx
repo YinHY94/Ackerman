@@ -394,16 +394,6 @@
           <GroupName>Application/User/Core</GroupName>
           <Files>
             <File>
-              <FileName>JY901.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\JY901.c</FilePath>
-            </File>
-            <File>
-              <FileName>JY901.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Core\Inc\JY901.h</FilePath>
-            </File>
-            <File>
               <FileName>encoder.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Core\Inc\encoder.h</FilePath>
@@ -454,6 +444,16 @@
               <FilePath>..\Core\Inc\bluetooth.h</FilePath>
             </File>
             <File>
+              <FileName>host_computer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\host_computer.c</FilePath>
+            </File>
+            <File>
+              <FileName>host_computer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\host_computer.h</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/main.c</FilePath>
@@ -462,11 +462,6 @@
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>dma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Core/Src/dma.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>

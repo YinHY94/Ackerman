@@ -63,8 +63,16 @@ void Error_Handler(void);
 #define L_DIR_GPIO_Port GPIOA
 #define L_PWM_Pin GPIO_PIN_5
 #define L_PWM_GPIO_Port GPIOA
+#define R_ENCODER_A_Pin GPIO_PIN_6
+#define R_ENCODER_A_GPIO_Port GPIOA
+#define R_ENCODER_B_Pin GPIO_PIN_7
+#define R_ENCODER_B_GPIO_Port GPIOA
 #define R_DIR_Pin GPIO_PIN_0
 #define R_DIR_GPIO_Port GPIOB
+#define L_ENCODER_B_Pin GPIO_PIN_8
+#define L_ENCODER_B_GPIO_Port GPIOA
+#define L_ENCODER_A_Pin GPIO_PIN_9
+#define L_ENCODER_A_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

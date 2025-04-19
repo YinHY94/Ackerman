@@ -22,20 +22,26 @@ Dialog DLL:      TCM.DLL V1.46.0.0
  
 <h2>Project:</h2>
 D:\STM32\stm32_project\STM32_F401CCU6\Ackerman\MDK-ARM\Ackerman.uvprojx
-Project File Date:  04/11/2025
+Project File Date:  04/19/2025
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'D:\keil_v5\ARM\ARMCC\Bin'
 Build target 'Ackerman'
 assembling startup_stm32f401xc.s...
-compiling main.c...
-compiling Motor.c...
 compiling Control.c...
-compiling Servo.c...
-linking...
-Program Size: Code=13934 RO-data=470 RW-data=336 ZI-data=2344  
-FromELF: creating hex file...
-"Ackerman\Ackerman.axf" - 0 Error(s), 0 Warning(s).
+../Core/Inc/host_computer.h(12): error:  #20: identifier "Car_Turning_State" is undefined
+  extern Car_Turning_State Ackerman_Turning;
+..\Core\Src\Control.c: 0 warnings, 1 error
+compiling main.c...
+../Core/Inc/host_computer.h(12): error:  #20: identifier "Car_Turning_State" is undefined
+  extern Car_Turning_State Ackerman_Turning;
+../Core/Src/main.c: 0 warnings, 1 error
+compiling bluetooth.c...
+../Core/Inc/host_computer.h(12): error:  #20: identifier "Car_Turning_State" is undefined
+  extern Car_Turning_State Ackerman_Turning;
+..\Core\Src\bluetooth.c: 0 warnings, 1 error
+compiling tim.c...
+"Ackerman\Ackerman.axf" - 3 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -59,7 +65,8 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.4.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:03
+Target not created.
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

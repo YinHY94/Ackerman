@@ -1,6 +1,6 @@
 #include "Servo.h"
 
-void Set_Servo_Angle(double angle){
+void Servo_Set_Angle(double angle){
 unsigned int servo_ccr=(unsigned int)(100*angle/9+SERVO_INIT);
 if(servo_ccr>SERVO_MAX)
 	servo_ccr=SERVO_MAX;

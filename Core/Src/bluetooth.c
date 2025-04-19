@@ -1,5 +1,7 @@
 #include "bluetooth.h"
 
+uint8_t bluetooth_data;
+
 void Get_Bluetooth_Data(uint8_t* bluetooth_data,uint16_t lenth){
 HAL_UARTEx_ReceiveToIdle_DMA(&huart1,bluetooth_data,lenth);
 }

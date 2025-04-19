@@ -2,8 +2,6 @@ ackerman\control.o: ..\Core\Src\Control.c
 ackerman\control.o: ../Core/Inc/Control.h
 ackerman\control.o: ../Core/Inc/Motor.h
 ackerman\control.o: D:\keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
-ackerman\control.o: ../Core/Inc/Control.h
-ackerman\control.o: ../Core/Inc/JY901.h
 ackerman\control.o: ../Core/Inc/Servo.h
 ackerman\control.o: ../Core/Inc/tim.h
 ackerman\control.o: ../Core/Inc/main.h
@@ -38,3 +36,7 @@ ackerman\control.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 ackerman\control.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 ackerman\control.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 ackerman\control.o: D:\keil_v5\ARM\ARMCC\Bin\..\include\math.h
+ackerman\control.o: ../Core/Inc/host_computer.h
+ackerman\control.o: ../Core/Inc/usart.h
+ackerman\control.o: D:\keil_v5\ARM\ARMCC\Bin\..\include\ctype.h
+ackerman\control.o: ../Core/Inc/Control.h

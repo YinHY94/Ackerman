@@ -31,12 +31,12 @@ Motor Right_Motor={
 //    }
 //}
 
-void Get_Motor_Direction(Motor* motor,DIR direction){
+void Motor_Get_Direction(Motor* motor,DIR direction){
 motor->Dir=direction;
 }
 
 // 设置电机方向
-void Set_Motor_Direction(Motor* motor,DIR dir) {
+static void Motor_Set_Direction(Motor* motor,DIR dir) {
 motor->Dir=dir;	
 if (motor->Num==0)
 HAL_GPIO_WritePin(L_DIR_GPIO_Port,L_DIR_Pin,motor->Dir ? GPIO_PIN_SET:GPIO_PIN_RESET);
@@ -47,16 +47,18 @@ HAL_GPIO_WritePin(R_DIR_GPIO_Port,R_DIR_Pin,motor->Dir ? GPIO_PIN_RESET:GPIO_PIN
 //获取编码器数值
 void Get_Encoder(Motor* motor){
 if (motor->Num==0){
-int16_t data=(int16_t)TIM1->CNT;
-motor->Encoder=data>0?data:-data;
-TIM1->CNT=0;}
+motor->Encoder=(int16_t)TIM1->CNT;
+TIM1->CNT=0;
+if(move_distance_state==0)
+	target_encoder-=motor->Encoder;}
 else if(motor->Num==1){
-int16_t data=(int16_t)TIM3->CNT;
-motor->Encoder=data>0?data:-data;
-TIM3->CNT=0;}
+motor->Encoder=(int16_t)TIM3->CNT;
+TIM3->CNT=0;
+if(move_distance_state==1)
+	target_encoder-=motor->Encoder;}
 }
 
-void Set_Motor_Speed(Motor* motor,int16_t speed){
+void Motor_Set_Speed(Motor* motor,int16_t speed){
 motor->Target=speed;
 }
 
@@ -78,17 +80,21 @@ motor->Ret = motor->Max;
 } else if (motor->Ret < motor->Min) {
 motor->Ret = motor->Min;
 }
-if(motor->Num==0)
-TIM2->CCR1=motor->Ret;
-else if(motor->Num==1)
-TIM2->CCR2=motor->Ret;
+//设置电机转向
+if(motor->Ret>0)
+Motor_Set_Direction(motor,Forward);	
+else
+Motor_Set_Direction(motor,Reverse);	
+//设置电机转速
+if(motor->Num==0){
+TIM2->CCR1=motor->Ret>0?motor->Ret:-motor->Ret;
+}else if(motor->Num==1)
+TIM2->CCR2=motor->Ret>0?motor->Ret:-motor->Ret;
 }
 
 void Motor_Stop(void){
-HAL_TIM_Base_Stop_IT(&htim4);
-HAL_TIM_Base_Stop_IT(&htim9);
-Set_Motor_Speed(&Left_Motor,0);
-Set_Motor_Speed(&Right_Motor,0);
+Motor_Set_Speed(&Left_Motor,0);
+Motor_Set_Speed(&Right_Motor,0);
 TIM2->CCR1=0;
 TIM2->CCR2=0;
 }
