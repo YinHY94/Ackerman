@@ -57,12 +57,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define R_PWM_Pin GPIO_PIN_1
-#define R_PWM_GPIO_Port GPIOA
 #define L_DIR_Pin GPIO_PIN_4
 #define L_DIR_GPIO_Port GPIOA
-#define L_PWM_Pin GPIO_PIN_5
-#define L_PWM_GPIO_Port GPIOA
 #define R_ENCODER_A_Pin GPIO_PIN_6
 #define R_ENCODER_A_GPIO_Port GPIOA
 #define R_ENCODER_B_Pin GPIO_PIN_7

@@ -92,7 +92,7 @@ void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = (21-1);
+  htim2.Init.Prescaler = (7-1);
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = (160-1);
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -433,7 +433,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     PA1     ------> TIM2_CH2
     PA5     ------> TIM2_CH1
     */
-    GPIO_InitStruct.Pin = R_PWM_Pin|L_PWM_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_1|GPIO_PIN_5;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

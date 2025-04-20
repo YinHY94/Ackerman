@@ -35,6 +35,7 @@ void Motor_Get_Direction(Motor* motor,DIR direction){
 motor->Dir=direction;
 }
 
+
 // 设置电机方向
 static void Motor_Set_Direction(Motor* motor,DIR dir) {
 motor->Dir=dir;	
@@ -43,6 +44,7 @@ HAL_GPIO_WritePin(L_DIR_GPIO_Port,L_DIR_Pin,motor->Dir ? GPIO_PIN_SET:GPIO_PIN_R
 else if (motor->Num==1)
 HAL_GPIO_WritePin(R_DIR_GPIO_Port,R_DIR_Pin,motor->Dir ? GPIO_PIN_RESET:GPIO_PIN_SET);
 }
+
 
 //获取编码器数值
 void Get_Encoder(Motor* motor){
@@ -58,9 +60,12 @@ if(move_distance_state==1)
 	target_encoder-=motor->Encoder;}
 }
 
+
 void Motor_Set_Speed(Motor* motor,int16_t speed){
+motor->Integral=0;
 motor->Target=speed;
 }
+
 
 void Motor_Speed_Control(Motor* motor){
 //获取当前速度
@@ -85,14 +90,17 @@ if(motor->Ret>0)
 Motor_Set_Direction(motor,Forward);	
 else
 Motor_Set_Direction(motor,Reverse);	
+int delta_ccr=(motor->Ret>0?motor->Ret:-motor->Ret);
 //设置电机转速
-if(motor->Num==0){
-TIM2->CCR1=motor->Ret>0?motor->Ret:-motor->Ret;
-}else if(motor->Num==1)
-TIM2->CCR2=motor->Ret>0?motor->Ret:-motor->Ret;
+if(motor->Num==0&&(((int16_t)TIM2->CCR1-CCR_INIT-delta_ccr)>1||((int16_t)TIM2->CCR1-CCR_INIT-delta_ccr)<-1)){
+TIM2->CCR1=CCR_INIT+delta_ccr;
+}else if(motor->Num==1&&(((int16_t)TIM2->CCR2-CCR_INIT-delta_ccr)>1||((int16_t)TIM2->CCR2-CCR_INIT-delta_ccr)<-1))
+TIM2->CCR2=CCR_INIT+delta_ccr;
 }
 
+
 void Motor_Stop(void){
+HAL_TIM_Base_Stop_IT(&htim5);
 Motor_Set_Speed(&Left_Motor,0);
 Motor_Set_Speed(&Right_Motor,0);
 TIM2->CCR1=0;

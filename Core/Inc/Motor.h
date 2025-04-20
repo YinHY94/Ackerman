@@ -3,12 +3,13 @@
 
 #include <stdint.h>
 
-#define MOTOR_KP 	0
-#define MOTOR_KI 	0
+#define MOTOR_KP 	0.5
+#define MOTOR_KI 	0.3
 #define MOTOR_KD 	0
 #define MOTOR_T  	0.01
-#define MOTOR_MAX  	159
-#define MOTOR_MIN  	-159
+#define MOTOR_MAX  	69
+#define MOTOR_MIN  	-69
+#define CCR_INIT   	90
 
 typedef enum{
 Forward,
