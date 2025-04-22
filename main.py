@@ -174,8 +174,8 @@ while True:
             if closest_last_point and min_distance < DISTANCE_THRESHOLD * 2:
                 # 检查是否从左到右穿过中心线
                 if closest_last_point[0] < frame_center_x and pt[0] > frame_center_x:
-                    # 点必须在画面的中间部分高度范围内
-                    if pt[1] > frame_height * 0.2 and pt[1] < frame_height * 0.8:
+                    # 点必须在底线的上下20%范围内
+                    if pt[1] > (bottom_line[0][1] + bottom_line[1][1]) // 2 - frame_height *0.2 and pt[1] < (bottom_line[0][1] + bottom_line[1][1]) // 2 + frame_height *0.2:    
                         point_crossed = True
                         corner_pass_count += 1
                         # 可视化这个穿越点
@@ -233,9 +233,8 @@ while True:
                 # 模式字节
                 mode_byte = mode_num & 0xFF
                 
-                # 角度值(带符号)，将角度乘以100以保留小数精度，除以100得到实际角度值
-                angle_value = int(bottom_angle * 100)  
-                # 分解为高低字节(有符号整数，范围-32768到32767)
+                # 角度字节
+                angle_value = int((bottom_angle / 90.0) * 32767)
                 angle_high = (angle_value >> 8) & 0xFF
                 angle_low = angle_value & 0xFF
                 
@@ -248,10 +247,10 @@ while True:
                 ser.write(data_to_send)
                 
                 # 显示发送的数据
-                cv2.putText(result, f"Sent: Head:0xAA Mode:{mode_num} Ang:{bottom_angle:.2f} |Dist|:{clamped_dist}", 
+                cv2.putText(result, f"Sent: Head:0xAA Mode:{mode_num} Ang:{bottom_angle:.2f}° |Dist|:{clamped_dist}", 
                           (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                 
-                print(f"发送数据: 数据头=0xAA, 模式={mode_num}, 角度={bottom_angle:.2f}°, 距离绝对值={clamped_dist}")
+                print(f"发送数据: 数据头=0xAA, 模式={mode_num}, 角度={bottom_angle:.2f}°,距离绝对值={clamped_dist}")
                 
             except Exception as e:
                 print(f"发送数据失败: {str(e)}")
