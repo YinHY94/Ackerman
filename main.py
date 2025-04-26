@@ -81,22 +81,39 @@ while True:
     frame_center_x = frame_width // 2
     frame_center_y = frame_height // 2
 
+    # 设置参考线在左侧四分之一处
+    reference_line_x = frame_width // 3
+    reference_line_y = frame_center_y
+    
+    # 定义忽略上部20%区域的遮罩
+    ignore_top_mask = np.zeros_like(frame[:,:,0], dtype=np.uint8)
+    top_cutoff = int(frame_height * 0.2)  # 忽略上部20%区域
+    ignore_top_mask[top_cutoff:, :] = 255
+    
     # 预处理
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
     _, binary = cv2.threshold(blurred, 80, 255, cv2.THRESH_BINARY_INV)
+    
+    # 应用遮罩，忽略上部区域
+    binary = cv2.bitwise_and(binary, binary, mask=ignore_top_mask)
 
-    kernel = np.ones((5, 5), np.uint8)
-    binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+    kernel = np.ones((25, 25), np.uint8)
+    #binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
     binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
 
-    # Canny 
-    edges = cv2.Canny(binary, 50, 150, apertureSize=3)
+    # # Canny 
+    # edges = cv2.Canny(binary, 50, 150, apertureSize=3)
 
     # 查找外部轮廓
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    result = frame.copy()
+    # 创建彩色版本的二值图像用于显示
+    result = cv2.cvtColor(binary.copy(), cv2.COLOR_GRAY2BGR)
+    
+    # 绘制忽略区域的线
+    cv2.line(result, (0, top_cutoff), (frame_width, top_cutoff), (0, 255, 255), 2)
+    
     bottom_line = None
     max_y = -1
     bottom_angle = None
@@ -107,6 +124,10 @@ while True:
     # 遍历轮廓
     for contour in contours:
         pts = contour.reshape(-1, 2)
+        # 筛选面积大于2700的轮廓
+        area = cv2.contourArea(contour)
+        if area <= 2700:
+            continue  # 跳过小面积轮廓
 
         # 近似轮廓为多边形
         epsilon = 0.01 * cv2.arcLength(contour, True)
@@ -172,10 +193,10 @@ while True:
             
             # 只有当距离小于阈值时才认为是同一个点
             if closest_last_point and min_distance < DISTANCE_THRESHOLD * 2:
-                # 检查是否从左到右穿过中心线
-                if closest_last_point[0] < frame_center_x and pt[0] > frame_center_x:
-                    # 点必须在底线的上下20%范围内
-                    if pt[1] > (bottom_line[0][1] + bottom_line[1][1]) // 2 - frame_height *0.2 and pt[1] < (bottom_line[0][1] + bottom_line[1][1]) // 2 + frame_height *0.2:    
+                # 检查是否从左到右穿过参考线
+                if closest_last_point[0] < reference_line_x and pt[0] > reference_line_x:
+                    # 点必须在画面的中间部分高度范围内
+                    if pt[1] > frame_height * 0.2 and pt[1] < frame_height * 0.8:
                         point_crossed = True
                         corner_pass_count += 1
                         # 可视化这个穿越点
@@ -190,11 +211,11 @@ while True:
         mode = "Backing"  # 中间车库，进入倒车
         mode_num = 1
     else :
-        mode = f"Mode {corner_pass_count}"  # 其他模式
+        mode = f"Mode {corner_pass_count}"  # 其他模式  
         mode_num = 0
 
     # 绘制最下面的近水平线段
-    if bottom_line:
+    if bottom_line is not None:
         cv2.line(result, bottom_line[0], bottom_line[1], (0, 255, 0), 2)
         
         # 计算线段中点
@@ -202,7 +223,7 @@ while True:
         mid_y = (bottom_line[0][1] + bottom_line[1][1]) // 2
         
         # 计算中点与画面中心的距离
-        distance_to_center = abs(mid_y - frame_center_y)
+        distance_to_center = abs(mid_y - reference_line_y)
         
         # 在图像上显示相关信息
         cv2.circle(result, (mid_x, mid_y), 5, (255, 0, 0), -1)  # 蓝色圆点表示线段中点
@@ -247,19 +268,19 @@ while True:
                 ser.write(data_to_send)
                 
                 # 显示发送的数据
-                cv2.putText(result, f"Sent: Head:0xAA Mode:{mode_num} Ang:{bottom_angle:.2f}° |Dist|:{clamped_dist}", 
+                cv2.putText(result, f"Sent: Head:0xAA Mode:{mode_num} Ang:{bottom_angle:.2f} |Dist|:{clamped_dist}", 
                           (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                 
-                print(f"发送数据: 数据头=0xAA, 模式={mode_num}, 角度={bottom_angle:.2f}°,距离绝对值={clamped_dist}")
+                print(f"发送数据: 数据头=0xAA, 模式={mode_num}, 角度={bottom_angle:.2f}°, 距离绝对值={clamped_dist}")
                 
             except Exception as e:
                 print(f"发送数据失败: {str(e)}")
-
-    # 画出帧中心位置
-    cv2.line(result, (frame_center_x, 0), (frame_center_x, frame_height), (0, 0, 255), 1)
-    cv2.line(result, (0, frame_center_y), (frame_width, frame_center_y), (0, 0, 255), 1)
+    # 画出参考线位置
+    cv2.line(result, (reference_line_x, 0), (reference_line_x, frame_height), (0, 0, 255), 1)
+    cv2.line(result, (0, reference_line_y), (frame_width, reference_line_y), (0, 0, 255), 1)
 
     # 显示结果
+    time.sleep(0.05)
     cv2.imshow("Bottom Line & Corners", result)
 
     # 按 'q' 键退出
