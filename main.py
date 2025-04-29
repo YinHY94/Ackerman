@@ -58,7 +58,7 @@ if not cap.isOpened():
 # 定义状态变量
 corner_pass_count = 0  # 初始化角点经过中心计数
 last_points = []
-DISTANCE_THRESHOLD = 20  # 相近点的距离阈值
+DISTANCE_THRESHOLD = 90  # 相近点的距离阈值
 mode = "Approaching"  # 初始化模式
 
 while True:
@@ -76,24 +76,22 @@ while True:
         print("无法读取帧，结束视频流")
         break
 
-    # 计算画面中心点
+    # 参考线
     frame_height, frame_width = frame.shape[:2]
     frame_center_x = frame_width // 2
-    frame_center_y = frame_height // 2
-
-    # 设置参考线在左侧四分之一处
-    reference_line_x = frame_width // 3
+    frame_center_y = frame_height // 3 * 2
+    reference_line_x = frame_width // 5 * 3
     reference_line_y = frame_center_y
     
     # 定义忽略上部20%区域的遮罩
     ignore_top_mask = np.zeros_like(frame[:,:,0], dtype=np.uint8)
-    top_cutoff = int(frame_height * 0.2)  # 忽略上部20%区域
+    top_cutoff = int(frame_height * 0.2)
     ignore_top_mask[top_cutoff:, :] = 255
     
     # 预处理
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    _, binary = cv2.threshold(blurred, 80, 255, cv2.THRESH_BINARY_INV)
+    blurred = cv2.bilateralFilter(gray, 5, 75, 75)  #图像, 直径, 颜色空间sigma, 坐标空间sigma
+    _, binary = cv2.threshold(blurred, 100, 255, cv2.THRESH_BINARY_INV)
     
     # 应用遮罩，忽略上部区域
     binary = cv2.bitwise_and(binary, binary, mask=ignore_top_mask)
@@ -101,9 +99,6 @@ while True:
     kernel = np.ones((25, 25), np.uint8)
     #binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
     binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
-
-    # # Canny 
-    # edges = cv2.Canny(binary, 50, 150, apertureSize=3)
 
     # 查找外部轮廓
     contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -179,7 +174,7 @@ while True:
     if last_points and merged_points:
         # 为每个当前点找到最接近的上一帧点
         for pt in merged_points:
-            if point_crossed:  # 如果已经检测到穿越，跳出循环
+            if point_crossed: 
                 break
                 
             closest_last_point = None
@@ -195,12 +190,12 @@ while True:
             if closest_last_point and min_distance < DISTANCE_THRESHOLD * 2:
                 # 检查是否从左到右穿过参考线
                 if closest_last_point[0] < reference_line_x and pt[0] > reference_line_x:
-                    # 点必须在画面的中间部分高度范围内
-                    if pt[1] > frame_height * 0.2 and pt[1] < frame_height * 0.8:
+                    # 点必须在检测线的上下20%之间
+                    if pt[1] > reference_line_y - 0.2 * frame_height and pt[1] < reference_line_y + 0.2 * frame_height:
                         point_crossed = True
                         corner_pass_count += 1
-                        # 可视化这个穿越点
-                        cv2.circle(result, pt, 8, (255, 255, 0), -1)  # 黄色大圆表示穿越点
+                        # 可视化穿越点
+                        cv2.circle(result, pt, 8, (255, 255, 0), -1)
                         print(f"角点从左到右经过中心，第 {corner_pass_count} 次，坐标: {pt}")
     
     # 更新上一帧的点
